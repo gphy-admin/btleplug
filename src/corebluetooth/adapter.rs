@@ -47,6 +47,7 @@ impl Adapter {
                         uuid,
                         name,
                         event_receiver,
+                        rssi
                     } => {
                         manager_clone.add_peripheral(Peripheral::new(
                             uuid,
@@ -54,13 +55,15 @@ impl Adapter {
                             Arc::downgrade(&manager_clone),
                             event_receiver,
                             adapter_sender_clone.clone(),
+                            rssi,
                         ));
                         manager_clone.emit(CentralEvent::DeviceDiscovered(uuid.into()));
                     }
-                    CoreBluetoothEvent::DeviceUpdated { uuid, name } => {
+                    CoreBluetoothEvent::DeviceUpdated { uuid, name, rssi } => {
                         let id = uuid.into();
                         if let Some(entry) = manager_clone.peripheral_mut(&id) {
                             entry.value().update_name(&name);
+                            entry.value().update_rssi(rssi);
                             manager_clone.emit(CentralEvent::DeviceUpdated(id));
                         }
                     }

@@ -83,6 +83,7 @@ impl Peripheral {
         manager: Weak<AdapterManager<Self>>,
         event_receiver: Receiver<CBPeripheralEvent>,
         message_sender: Sender<CoreBluetoothMessage>,
+        rssi: i16
     ) -> Self {
         // Since we're building the object, we have an active advertisement.
         // Build properties now.
@@ -91,7 +92,7 @@ impl Peripheral {
             address_type: None,
             local_name,
             tx_power_level: None,
-            rssi: None,
+            rssi: Some(rssi),
             manufacturer_data: HashMap::new(),
             service_data: HashMap::new(),
             services: Vec::new(),
@@ -161,6 +162,10 @@ impl Peripheral {
 
     pub(super) fn update_name(&self, name: &str) {
         self.shared.properties.lock().unwrap().local_name = Some(name.to_string());
+    }
+
+    pub(super) fn update_rssi(&self, rssi: i16) {
+        self.shared.properties.lock().unwrap().rssi = Some(rssi);
     }
 }
 
